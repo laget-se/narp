@@ -4,12 +4,15 @@ import { GETTEXT_FUNC_ARGS_MAP, GETTEXT_COMPONENT_PROPS_MAP } from 'react-gettex
 import extend from 'deep-extend';
 
 const config = {
-  transifex: {},
+  transifex: {
+    sourceLang: 'en',
+  },
   extract: {
     componentPropsMap: GETTEXT_COMPONENT_PROPS_MAP,
     funcArgumentsMap: GETTEXT_FUNC_ARGS_MAP,
   },
   merge: {},
+  output: 'messages.json',
 };
 
 export const getConfig = () => {
