@@ -1,3 +1,6 @@
 {
-  "extends": "lagetse"
+  "extends": "lagetse",
+  "rules": {
+    "no-console": 0
+  }
 }

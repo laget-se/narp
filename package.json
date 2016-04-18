@@ -19,6 +19,7 @@
     "eslint-config-lagetse": "^1.1.0"
   },
   "dependencies": {
+    "@lagetse/pot-merge": "^2.0.0",
     "deep-extend": "^0.4.1",
     "fetch": "^1.0.1",
     "react-gettext-parser": "^0.1.1",
