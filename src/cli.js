@@ -15,3 +15,4 @@ if (args._[0] === 'pull') {
 if (args._[0] === 'push') {
   api.push();
 }
+

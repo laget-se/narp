@@ -2,7 +2,8 @@
   "name": "narp",
   "version": "1.0.0",
   "description": "The worlds best super translation manager package handler",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "bin": "bin/narp.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel --out-dir dist src"
@@ -18,6 +19,9 @@
     "eslint-config-lagetse": "^1.1.0"
   },
   "dependencies": {
+    "deep-extend": "^0.4.1",
+    "fetch": "^1.0.1",
+    "react-gettext-parser": "^0.1.1",
     "yargs": "^4.6.0"
   }
 }
