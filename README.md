@@ -1,24 +1,22 @@
 # narp
 
-`narp` is a workflow utility to ease localization in JS(X) apps by automizing the following steps:
+A workflow utility to ease localization in JS(X) apps by automizing the following steps:
 
-* Extraction of strings from source code ([react-gettext-parser](https://github.com/alexanderwallin/react-gettext-parser))
-* Merging upstream and local translations in order to support translations in branches ([pot-merge](https://github.com/laget-se/pot-merge))
-* Uploading POT resources to Transifex
-* Download PO translations from Transifex
-* Converting PO to JSON ([gettext-parser](https://github.com/andris9/gettext-parser))
-* Writing the JSON translations to where you want it
+**`narp push`**
 
-For convenience, these tasks are grouped in two wrappers: `narp push` and `narp pull`.
+1. Extraction of strings from source code ([react-gettext-parser](https://github.com/alexanderwallin/react-gettext-parser))
+2. Merging upstream and local translations in order to support translations in branches ([pot-merge](https://github.com/laget-se/pot-merge))
+3. Uploading POT resources to Transifex
 
-* [#workflow]
-* [#installation]
-* [#usage]
-* [#development]
+**`narp pull`**
 
-## Workflow
+1. Download PO translations from Transifex
+2. Converting PO to JSON ([gettext-parser](https://github.com/andris9/gettext-parser))
+3. Writing the JSON translations to where you want it
 
-![narp workflow](docs/narp-workflow.png)
+* [Installation](#installation)
+* [Usage](#usage)
+* [Development](#development)
 
 ## Installation
 
