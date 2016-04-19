@@ -34,12 +34,12 @@ npm install --save-dev narp
 
 ```sh
 # extract + merge pots + upload pot
-node push
+node push --password MY_TRANSIFEX_PASS
 ```
 
 ```sh
 # download po's + convert to json + write to file
-node pull
+node pull --password MY_TRANSIFEX_PASS
 ```
 
 ### Using the API
@@ -47,9 +47,15 @@ node pull
 ```js
 import { push, pull } from 'narp';
 
-push();
+const configs = {
+  transifex: {
+    password: 'retrieve this somehow, don\'t check it in'
+  },
+};
 
-pull();
+push(configs);
+
+pull(configs);
 ```
 
 ## Configuration in .narprc
@@ -64,7 +70,6 @@ The defaults are:
 {
   "transifex": {
     "username": null,
-    "password": null,
     "project": null,
     "resource": null,
     "sourceLang": "en"
