@@ -4,10 +4,20 @@ import { fetchUrl } from 'fetch';
 import { mergePotContents } from '@lagetse/pot-merge';
 import { po } from 'gettext-parser';
 import fs from 'fs';
+import extend from 'deep-extend';
 
-const pull = () => {
-  const conf = getConfig();
+const assertPassword = config => {
+  if (!config.transifex.password) {
+    console.log('You need to provide a Transifex password using --password MYPASS');
+    process.exit(0);
+  }
+};
+
+const pull = (configs = {}) => {
+  const conf = extend(getConfig(), configs);
   const { project, resource, username, password, sourceLang } = conf.transifex;
+
+  assertPassword(conf);
 
   // pull trans from transifex
   fetchUrl(`http://www.transifex.com/api/2/project/${project}/languages`, {
@@ -61,9 +71,12 @@ const pull = () => {
   console.log('pull pull');
 };
 
-const push = () => {
+const push = (configs = {}) => {
   // extract strings from source => extract
-  const conf = getConfig();
+  const conf = extend(getConfig(), configs);
+
+  assertPassword(conf);
+
   const messages = extractMessagesFromGlob(conf.extract.source);
   const pot = toPot(messages);
 
