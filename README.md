@@ -82,6 +82,7 @@ The defaults are:
     "sourceLang": "en"
   },
   "extract": {
+    "source": null, // A glob to pass to react-gettext-parser
     "componentPropsMap": { /* react-gettext-parser defaults */ },
     "funcArgumentsMap": { /* react-gettext-parser defaults */ }
   },
