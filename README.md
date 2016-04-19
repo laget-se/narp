@@ -14,6 +14,8 @@ A workflow utility to ease localization in JS(X) apps by automizing the followin
 2. Converting PO to JSON ([gettext-parser](https://github.com/andris9/gettext-parser))
 3. Writing the JSON translations to where you want it
 
+The JSON translations are formatted for [node-gettext](https://github.com/andris9/node-gettext), so using this as the gettext frameform is a really good idea. :)
+
 ## Installation
 
 To use it easily, install narp globally with:
