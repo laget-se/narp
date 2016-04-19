@@ -5,6 +5,7 @@ import * as api from './index';
 const addPasswordOption = yargsObj =>
   yargsObj
     .option('password', {
+      alias: 'p',
       type: 'password',
     })
     .demand(['password']);

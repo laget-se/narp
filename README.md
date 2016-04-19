@@ -33,6 +33,11 @@ npm install --save-dev narp
 ### Using the CLI
 
 ```sh
+# get help
+narp -h
+```
+
+```sh
 # extract + merge pots + upload pot
 node push --password MY_TRANSIFEX_PASS
 ```
@@ -41,6 +46,8 @@ node push --password MY_TRANSIFEX_PASS
 # download po's + convert to json + write to file
 node pull --password MY_TRANSIFEX_PASS
 ```
+
+`--password` is also available as `-p`.
 
 ### Using the API
 
