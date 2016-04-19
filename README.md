@@ -14,10 +14,6 @@ A workflow utility to ease localization in JS(X) apps by automizing the followin
 2. Converting PO to JSON ([gettext-parser](https://github.com/andris9/gettext-parser))
 3. Writing the JSON translations to where you want it
 
-* [Installation](#installation)
-* [Usage](#usage)
-* [Development](#development)
-
 ## Installation
 
 To use it easily, install narp globally with:
@@ -44,6 +40,16 @@ node push
 ```sh
 # download po's + convert to json + write to file
 node pull
+```
+
+### Using the API
+
+```js
+import { push, pull } from 'narp';
+
+push();
+
+pull();
 ```
 
 ## Configuration in .narprc
