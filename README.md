@@ -81,11 +81,21 @@ The defaults are:
     "resource": null,
     "sourceLang": "en"
   },
+  
+  // Configs that are passed to react-gettext-parser
   "extract": {
-    "source": null, // A glob to pass to react-gettext-parser
+  
+    // A glob string (npmjs.com/glob) that matches all source files
+    // that may contain translatable strings.
+    "source": null,
+    
+    // These two are passed directly to react-gettext-parser,
+    // see the react-gettext-parser readme
     "componentPropsMap": { /* react-gettext-parser defaults */ },
     "funcArgumentsMap": { /* react-gettext-parser defaults */ }
   },
+  
+  // Where to put all the translations
   "output": "messages.json"
 }
 ```
