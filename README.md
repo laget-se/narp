@@ -1,4 +1,4 @@
-# narp
+# narp ![narp](narp.png)
 
 A workflow utility to ease localization in JS(X) apps by automizing the following steps:
 
