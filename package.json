@@ -4,6 +4,10 @@
   "description": "The worlds best super translation manager package handler",
   "main": "dist/index.js",
   "bin": "bin/narp.js",
+  "files": [
+    "bin",
+    "dist"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prebuild": "rimraf dist",
