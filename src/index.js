@@ -4,7 +4,9 @@ import { fetchUrl } from 'fetch';
 import { mergePotContents } from '@lagetse/pot-merge';
 import { po } from 'gettext-parser';
 import fs from 'fs';
+import path from 'path';
 import extend from 'deep-extend';
+import mkdirp from 'mkdirp';
 
 const assertPassword = config => {
   if (!config.transifex.password) {
@@ -59,6 +61,9 @@ const pull = (configs = {}) => {
         console.log(translations[lang]);
 
         if (Object.keys(translations).length === langs.length) {
+          // Make sure the output directory exists
+          mkdirp.sync(path.dirname(conf.output));
+
           fs.writeFileSync(conf.output, JSON.stringify(translations, null, 2));
         }
       });
