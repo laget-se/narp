@@ -1,5 +1,5 @@
 import { getConfig } from './confighelpers';
-import { kill } from './feedback.js';
+import * as feedback from './feedback.js';
 import { extractMessagesFromGlob, toPot } from 'react-gettext-parser';
 import { fetchUrl } from 'fetch';
 import { mergePotContents } from '@lagetse/pot-merge';
@@ -17,28 +17,37 @@ const assertPassword = config => {
 };
 
 const pull = (configs = {}) => {
+  feedback.begin('pull');
+
   const conf = extend(getConfig(), configs);
   const { project, resource, username, password, sourceLang } = conf.transifex;
 
   assertPassword(conf);
+
+  const rant = feedback.ranter(conf.verbose);
+
+  feedback.step('Fetching available languages from Transifex...');
 
   // pull trans from transifex
   fetchUrl(`http://www.transifex.com/api/2/project/${project}/languages`, {
     headers: { Authorization: `Basic ${new Buffer(`${username}:${password}`).toString('base64')}` },
   }, (err, meta, body) => {
     if (err) {
-      console.log(err);
-      process.exit(1);
+      feedback.kill(err);
     }
 
     if (meta.status >= 400) {
-      console.log(meta);
-      process.exit(1);
+      rant('Request error', body.toString());
+      feedback.kill(meta);
     }
 
     const data = JSON.parse(body.toString());
     const langs = data.map(x => x.language_code).concat(sourceLang);
     const translations = {};
+
+    rant('Got languages:', langs);
+
+    feedback.step('Fetching translations for all languages...');
 
     langs.forEach(lang => {
       fetchUrl(`http://www.transifex.com/api/2/project/${project}/resource/${resource}/translation/${lang}`, {
@@ -48,24 +57,26 @@ const pull = (configs = {}) => {
         },
       }, (err, meta, body) => {
         if (err) {
-          console.log(err);
-          process.exit(1);
+          feedback.kill(err);
         }
 
         if (meta.status >= 400) {
-          console.log(meta);
-          process.exit(1);
+          rant('Request error', body.toString());
+          feedback.kill(meta);
         }
 
-        // console.log(body.toString());
+        rant(`Got translations for ${lang}`, body.toString());
         translations[lang] = po.parse(JSON.parse(body.toString()).content);
-        // console.log(translations[lang]);
 
         if (Object.keys(translations).length === langs.length) {
+          feedback.step('Writing all translations to', path.resolve(conf.output));
+
           // Make sure the output directory exists
           mkdirp.sync(path.dirname(conf.output));
 
           fs.writeFileSync(conf.output, JSON.stringify(translations, null, 2));
+
+          feedback.finish('Translations pulled.');
         }
       });
     });
@@ -73,37 +84,45 @@ const pull = (configs = {}) => {
 };
 
 const push = (configs = {}) => {
+  feedback.begin('push');
+
   // extract strings from source => extract
   const conf = extend(getConfig(), configs);
 
   assertPassword(conf);
 
-  console.log('Extracting messages from source code...');
+  const rant = feedback.ranter(conf.verbose);
+
+  feedback.step('Extracting messages from source code...');
   const messages = extractMessagesFromGlob(conf.extract.source);
   const pot = toPot(messages);
+  rant('extracted pot:', pot);
 
   const { project, resource, username, password } = conf.transifex;
 
   // pull translations from transifex
-  console.log('Fetching POT from Transifex...');
+  feedback.step('Fetching POT from Transifex...');
   fetchUrl(`http://www.transifex.com/api/2/project/${project}/resource/${resource}/content?file`, {
     headers: { Authorization: `Basic ${new Buffer(`${username}:${password}`).toString('base64')}` },
   }, (err, meta, body) => {
     if (err) {
-      kill(err);
+      feedback.kill(err);
     }
 
     if (meta.status >= 400) {
       console.log(body.toString());
-      kill(meta);
+      feedback.kill(meta);
     }
 
+    rant('...got pot from transifex:\n', body.toString());
+
     // Merge pots
-    console.log('Merging upstream and extracted POT files...');
+    feedback.step('Merging upstream and extracted POT files...');
     const mergedPot = mergePotContents(pot, body.toString('utf-8'));
+    rant('...merged pot:\n', mergedPot);
 
     // push pots to transifex
-    console.log('Uploading new POT to Transifex...');
+    feedback.step('Uploading new POT to Transifex...');
     fetchUrl(`http://www.transifex.com/api/2/project/${project}/resource/${resource}/content/`, {
       method: 'PUT',
       payload: JSON.stringify({ content: mergedPot }),
@@ -113,15 +132,15 @@ const push = (configs = {}) => {
       },
     }, (err, meta, body) => {
       if (err) {
-        kill(err);
+        feedback.kill(err);
       }
 
       if (meta.status >= 400) {
         console.log(body.toString());
-        kill(meta);
+        feedback.kill(meta);
       }
 
-      console.log('Source file updated and uploaded.');
+      feedback.finish('Source file updated and uploaded.');
     });
   });
 };
