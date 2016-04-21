@@ -1,4 +1,5 @@
 import { getConfig } from './confighelpers';
+import { kill } from './feedback.js';
 import { extractMessagesFromGlob, toPot } from 'react-gettext-parser';
 import { fetchUrl } from 'fetch';
 import { mergePotContents } from '@lagetse/pot-merge';
@@ -56,9 +57,9 @@ const pull = (configs = {}) => {
           process.exit(1);
         }
 
-        console.log(body.toString());
+        // console.log(body.toString());
         translations[lang] = po.parse(JSON.parse(body.toString()).content);
-        console.log(translations[lang]);
+        // console.log(translations[lang]);
 
         if (Object.keys(translations).length === langs.length) {
           // Make sure the output directory exists
@@ -69,11 +70,6 @@ const pull = (configs = {}) => {
       });
     });
   });
-
-  // convert pot to json
-  // json to bundle
-
-  console.log('pull pull');
 };
 
 const push = (configs = {}) => {
@@ -82,46 +78,47 @@ const push = (configs = {}) => {
 
   assertPassword(conf);
 
+  console.log('Extracting messages from source code...');
   const messages = extractMessagesFromGlob(conf.extract.source);
   const pot = toPot(messages);
 
   const { project, resource, username, password } = conf.transifex;
 
   // pull translations from transifex
+  console.log('Fetching POT from Transifex...');
   fetchUrl(`http://www.transifex.com/api/2/project/${project}/resource/${resource}/content?file`, {
     headers: { Authorization: `Basic ${new Buffer(`${username}:${password}`).toString('base64')}` },
   }, (err, meta, body) => {
     if (err) {
-      console.log(err);
-      process.exit(1);
+      kill(err);
     }
 
     if (meta.status >= 400) {
-      console.log(meta);
-      process.exit(1);
+      console.log(body.toString());
+      kill(meta);
     }
 
-    const data = body.toString('utf-8');
-    // merge pots
-    const output = mergePotContents(pot, data);
+    // Merge pots
+    console.log('Merging upstream and extracted POT files...');
+    const mergedPot = mergePotContents(pot, body.toString('utf-8'));
 
     // push pots to transifex
+    console.log('Uploading new POT to Transifex...');
     fetchUrl(`http://www.transifex.com/api/2/project/${project}/resource/${resource}/content/`, {
       method: 'PUT',
-      payload: JSON.stringify({ content: output }),
+      payload: JSON.stringify({ content: mergedPot }),
       headers: {
         'Authorization': `Basic ${new Buffer(`${username}:${password}`).toString('base64')}`,
         'Content-Type': 'application/json',
       },
     }, (err, meta, body) => {
       if (err) {
-        console.log(err);
-        process.exit(1);
+        kill(err);
       }
 
       if (meta.status >= 400) {
-        console.log(meta);
-        process.exit(1);
+        console.log(body.toString());
+        kill(meta);
       }
 
       console.log('Source file updated and uploaded.');
