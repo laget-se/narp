@@ -25,12 +25,12 @@
     "rimraf": "^2.5.2"
   },
   "dependencies": {
-    "@lagetse/pot-merge": "^2.0.0",
+    "@lagetse/pot-merge": "^2.0.2",
     "deep-extend": "^0.4.1",
     "fetch": "^1.0.1",
     "gettext-parser": "^1.1.2",
     "mkdirp": "^0.5.1",
-    "react-gettext-parser": "^0.1.1",
+    "react-gettext-parser": "^0.2.1",
     "yargs": "^4.6.0"
   }
 }
