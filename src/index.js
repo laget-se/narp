@@ -118,7 +118,7 @@ const push = (configs = {}) => {
 
     // Merge pots
     feedback.step('Merging upstream and extracted POT files...');
-    const mergedPot = mergePotContents(pot, body.toString('utf-8'));
+    const mergedPot = mergePotContents(body.toString('utf-8'), pot);
     rant('...merged pot:\n', mergedPot);
 
     // push pots to transifex
@@ -146,4 +146,3 @@ const push = (configs = {}) => {
 };
 
 export { pull, push };
-
