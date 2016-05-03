@@ -31,7 +31,7 @@
     "fetch": "^1.0.1",
     "gettext-parser": "^1.1.2",
     "mkdirp": "^0.5.1",
-    "react-gettext-parser": "^0.2.2",
+    "react-gettext-parser": "^1.0.0",
     "yargs": "^4.6.0"
   }
 }
