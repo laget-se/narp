@@ -1,6 +1,6 @@
 {
   "name": "narp",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "The worlds best super translation manager package handler",
   "main": "dist/index.js",
   "bin": "bin/narp.js",
@@ -12,6 +12,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prebuild": "rimraf dist",
     "build": "babel --out-dir dist src"
+  },
+  "homepage": "https://github.com/laget-se/narp",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/laget-se/narp.git"
   },
   "author": "",
   "license": "ISC",
