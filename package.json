@@ -1,6 +1,6 @@
 {
   "name": "narp",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "The worlds best super translation manager package handler",
   "main": "dist/index.js",
   "bin": "bin/narp.js",
@@ -25,7 +25,7 @@
     "rimraf": "^2.5.2"
   },
   "dependencies": {
-    "@lagetse/pot-merge": "^2.0.2",
+    "pot-merge": "^2.0.2",
     "colors": "^1.1.2",
     "deep-extend": "^0.4.1",
     "fetch": "^1.0.1",
