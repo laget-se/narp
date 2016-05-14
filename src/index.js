@@ -2,7 +2,7 @@ import { getConfig } from './confighelpers';
 import * as feedback from './feedback.js';
 import { extractMessagesFromGlob, toPot } from 'react-gettext-parser';
 import { fetchUrl } from 'fetch';
-import { mergePotContents } from '@lagetse/pot-merge';
+import { mergePotContents } from 'pot-merge';
 import { po } from 'gettext-parser';
 import fs from 'fs';
 import path from 'path';
