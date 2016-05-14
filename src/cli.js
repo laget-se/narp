@@ -1,19 +1,15 @@
 import yargs from 'yargs';
+import read from 'read';
 import * as api from './index';
 
 // Adds a password option to the yargs object
 const sharedOptions = yargsObj =>
   yargsObj
-    .option('password', {
-      alias: 'p',
-      type: 'password',
-    })
     .option('verbose', {
       alias: 'v',
       type: 'boolean',
       description: 'More verbose output',
-    })
-    .demand(['password']);
+    });
 
 // Construct the CLI
 const args = yargs
@@ -23,18 +19,30 @@ const args = yargs
   .alias('help', 'h')
   .argv;
 
-const options = {
-  transifex: {
-    password: args.password,
-  },
-  verbose: args.verbose,
-};
+
+
+const askForPassword = (fn) => {
+  read({ prompt: 'Password: ', silent: true }, (er, password) => {
+
+    const options = {
+      transifex: {
+        password: password,
+      },
+      verbose: args.verbose,
+    };
+
+    fn(options);
+  })
+}
 
 if (args._[0] === 'pull') {
-  api.pull(options);
+  askForPassword(options => {
+    api.pull(options);
+  });
 }
 
 if (args._[0] === 'push') {
-  api.push(options);
+  askForPassword(options => {
+    api.push(options);
+  });
 }
-
