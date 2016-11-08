@@ -30,14 +30,14 @@
     "rimraf": "^2.5.2"
   },
   "dependencies": {
-    "pot-merge": "^2.0.3",
     "colors": "^1.1.2",
     "deep-extend": "^0.4.1",
     "fetch": "^1.0.1",
-    "read": "^1.0.7",
     "gettext-parser": "^1.1.2",
     "mkdirp": "^0.5.1",
+    "pot-merge": "^2.1.0",
     "react-gettext-parser": "^1.0.0",
+    "read": "^1.0.7",
     "yargs": "^4.6.0"
   }
 }
