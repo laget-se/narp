@@ -20,28 +20,39 @@ const args = yargs
   .argv;
 
 
+const buildOptions = (password, verbose) =>
+  ({
+    transifex: {
+      password,
+    },
+    verbose,
+  });
 
 const askForPassword = (fn) => {
   read({ prompt: 'Password: ', silent: true }, (er, password) => {
-    const options = {
-      transifex: {
-        password,
-      },
-      verbose: args.verbose,
-    };
-
+    const options = buildOptions(password, args.verbose);
     fn(options);
   });
 };
 
 if (args._[0] === 'pull') {
-  askForPassword(options => {
-    api.pull(options);
-  });
+  if (!args.password) {
+    askForPassword(options => {
+      api.pull(options);
+    });
+  }
+  else {
+    api.pull(buildOptions(args.password, args.verbose));
+  }
 }
 
 if (args._[0] === 'push') {
-  askForPassword(options => {
-    api.push(options);
-  });
+  if (!args.password) {
+    askForPassword(options => {
+      api.push(options);
+    });
+  }
+  else {
+    api.push(buildOptions(args.password, args.verbose));
+  }
 }
