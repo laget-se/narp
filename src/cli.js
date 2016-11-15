@@ -23,17 +23,16 @@ const args = yargs
 
 const askForPassword = (fn) => {
   read({ prompt: 'Password: ', silent: true }, (er, password) => {
-
     const options = {
       transifex: {
-        password: password,
+        password,
       },
       verbose: args.verbose,
     };
 
     fn(options);
-  })
-}
+  });
+};
 
 if (args._[0] === 'pull') {
   askForPassword(options => {
