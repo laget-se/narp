@@ -41,15 +41,23 @@ narp -h
 
 ```sh
 # extract + merge pots + upload pot
-node push --password MY_TRANSIFEX_PASS
+narp push --password MY_TRANSIFEX_PASS
 ```
 
 ```sh
 # download po's + convert to json + write to file
-node pull --password MY_TRANSIFEX_PASS
+narp pull --password MY_TRANSIFEX_PASS
 ```
 
 `--password` is also available as `-p`.
+
+```sh
+# extract messages to stdout (no password required)
+narp extract [./path/to/comps]
+
+Optionally put a path as arg 2 to just extract from the folder.
+Protip, pipe to file if you want to use it.
+```
 
 ### Using the API
 
@@ -83,20 +91,20 @@ The defaults are:
     "resource": null,
     "sourceLang": "en"
   },
-  
+
   // Configs that are passed to react-gettext-parser
   "extract": {
-  
+
     // A glob string (npmjs.com/glob) that matches all source files
     // that may contain translatable strings.
     "source": null,
-    
+
     // These two are passed directly to react-gettext-parser,
     // see the react-gettext-parser readme
     "componentPropsMap": { /* react-gettext-parser defaults */ },
     "funcArgumentsMap": { /* react-gettext-parser defaults */ }
   },
-  
+
   // Where to put all the translations
   "output": "messages.json"
 }

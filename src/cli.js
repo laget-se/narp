@@ -56,3 +56,7 @@ if (args._[0] === 'push') {
     api.push(buildOptions(args.password, args.verbose));
   }
 }
+
+if (args._[0] === 'extract') {
+  api.extract(buildOptions(null, args.verbose), args._[1]);
+}
