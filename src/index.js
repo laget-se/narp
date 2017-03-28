@@ -145,4 +145,26 @@ const push = (configs = {}) => {
   });
 };
 
-export { pull, push };
+const extract = (configs = {}, inputSource = '') => {
+  feedback.begin('extraction');
+
+  // extract strings from source => extract
+  const conf = extend(getConfig(), configs);
+  const rant = feedback.ranter(true);
+  const source = inputSource.length > 0
+                 ? [`${inputSource}/**/\{*.js,*.jsx\}`]
+                 : conf.extract.source;
+
+  feedback.step('Extracting messages from source code...');
+  const messages = extractMessagesFromGlob(source);
+
+  messages.forEach(msg => {
+    const { reference } = msg.comments;
+    const refs = reference.map(r => inputSource.length ? r.replace(inputSource, '') : r);
+    rant(`${refs.join(', ')} -> ${msg.msgid}`);
+  });
+
+  feedback.finish('Extracted all messages for you.');
+};
+
+export { pull, push, extract };
