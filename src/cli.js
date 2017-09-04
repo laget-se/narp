@@ -22,8 +22,8 @@ const args = yargs
 
 const buildOptions = (password, verbose) =>
   ({
-    transifex: {
-      password,
+    vendor: {
+      credentials: { password },
     },
     verbose,
   });
