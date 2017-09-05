@@ -38,17 +38,17 @@ const getVendor = vendorName => {
  * output path.
  */
 const pull = (configs = {}) => {
+  const conf = extend(getConfig(), configs);
+
+  feedback.setVerbose(conf.verbose);
   feedback.begin('pull');
 
-  const conf = extend(getConfig(), configs);
   const { name, credentials, options } = conf.vendor;
 
   assertVendor(name);
 
   const vendor = getVendor(name);
   vendor.assertCredentials(credentials);
-
-  // const rant = feedback.ranter(conf.verbose);
 
   // Fetch translations
   return vendor.fetchTranslations(options, credentials).then(translations => {
@@ -70,9 +70,11 @@ const pull = (configs = {}) => {
  * vendor.
  */
 const push = (configs = {}) => {
+  const conf = extend(getConfig(), configs);
+
+  feedback.setVerbose(conf.verbose);
   feedback.begin('push');
 
-  const conf = extend(getConfig(), configs);
   const { name, credentials, options } = conf.vendor;
 
   assertVendor(name);
@@ -80,23 +82,23 @@ const push = (configs = {}) => {
   const vendor = getVendor(name);
   vendor.assertCredentials(credentials);
 
-  // const rant = feedback.ranter(conf.verbose);
-
   feedback.step('Extracting messages from source code...');
   const messages = extractMessagesFromGlob(conf.extract.source);
   const pot = toPot(messages);
-  // rant('extracted pot:', pot);
+  feedback.rant('Extracted pot:', pot);
 
-  feedback.step('Fetching POT from Transifex...');
+  feedback.step('Fetching upstream POT source...');
 
   return vendor.fetchSource(options, credentials)
     .then(sourcePot => {
+      feedback.rant('...got POT source:', sourcePot);
       feedback.step('Merging upstream and extracted POT files...');
       return sourcePot.trim().length > 0
         ? mergePotContents(sourcePot, pot)
         : pot;
     })
     .then(mergedPot => {
+      feedback.rant('...merged POT into:', mergedPot);
       feedback.step('Uploading new POT...');
       return vendor.uploadTranslations(mergedPot, options, credentials);
     })
@@ -109,11 +111,12 @@ const push = (configs = {}) => {
  * them to the console.
  */
 const extract = (configs = {}, inputSource = '') => {
+  const conf = extend(getConfig(), configs);
+
+  feedback.setVerbose(true);
   feedback.begin('extraction');
 
   // extract strings from source => extract
-  const conf = extend(getConfig(), configs);
-  const rant = feedback.ranter(true);
   const source = inputSource.length > 0
                  ? [`${inputSource}/**/\{*.js,*.jsx\}`]
                  : conf.extract.source;
@@ -124,7 +127,7 @@ const extract = (configs = {}, inputSource = '') => {
   messages.forEach(msg => {
     const { reference } = msg.comments;
     const refs = reference.map(r => inputSource.length ? r.replace(inputSource, '') : r);
-    rant(`${refs.join(', ')} -> ${msg.msgid}`);
+    feedback.rant(`${refs.join(', ')} -> ${msg.msgid}`);
   });
 
   feedback.finish('Extracted all messages for you.');

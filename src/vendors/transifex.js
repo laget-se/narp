@@ -43,8 +43,9 @@ const fetchTranslationsForLang = ({ project, resource, language }, { username, p
   const headers = getHeaders({ username, password });
 
   return got.get(url, { headers }).then(({ body }) => {
-    // rant(`Got translations for ${lang}`, body.toString());
-    return po.parse(JSON.parse(body).content);
+    const potContents = JSON.parse(body).content;
+    feedback.rant(`Got translations for ${language}`, potContents);
+    return po.parse(potContents);
   });
 };
 
@@ -59,7 +60,7 @@ export const fetchTranslations = (options, credentials = {}) => {
 
   return fetchLanguages(options, credentials)
     .then(languages => {
-      feedback.step('Fetching translations for all languages...');
+      feedback.step(`Fetching translations for languages: ${languages} ...`);
       return languages;
     })
     .then(languages => languages.concat(sourceLanguage))

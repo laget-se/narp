@@ -75,7 +75,10 @@ const fetchPoUrl = ({ project, language }, { token }) =>
 const fetchTranslationsForLang = ({ project, language }, { token }) =>
   fetchPoUrl({ project, language }, { token })
     .then(poUrl => (poUrl ? got.get(poUrl).then(results => results.body) : ''))
-    .then(potContents => po.parse(potContents));
+    .then(potContents => {
+      feedback.rant(`Got translations for ${language}`, potContents);
+      return po.parse(potContents);
+    });
 
 /**
  * Fetches all translations available and parses them into one big
@@ -84,9 +87,11 @@ const fetchTranslationsForLang = ({ project, language }, { token }) =>
 export const fetchTranslations = (options, credentials = {}) => {
   const { project } = options;
 
+  feedback.step('Fetching available languages from POEditor...');
+
   return fetchLanguages({ project }, credentials)
     .then(languages => {
-      feedback.step(`Fetching translations for all languages... ${languages}`);
+      feedback.step(`Fetching translations for languages: ${languages} ...`);
       return languages;
     })
     .then(languages => Promise.all(

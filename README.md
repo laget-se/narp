@@ -129,7 +129,10 @@ This is the shape of narp's configuration. It can be provided as an object to th
   },
 
   // Where to put all the translations
-  "output": "messages.json"
+  "output": "messages.json",
+
+  // If true, will output debug information to the console
+  "verbose": false
 }
 ```
 
