@@ -51,7 +51,7 @@ const pull = (configs = {}) => {
   // const rant = feedback.ranter(conf.verbose);
 
   // Fetch translations
-  vendor.fetchTranslations(options, credentials).then(translations => {
+  return vendor.fetchTranslations(options, credentials).then(translations => {
     feedback.step('Writing all translations to', path.resolve(conf.output));
 
     // Make sure the output directory exists
@@ -89,7 +89,7 @@ const push = (configs = {}) => {
 
   feedback.step('Fetching POT from Transifex...');
 
-  vendor.fetchSource(options, credentials)
+  return vendor.fetchSource(options, credentials)
     .then(sourcePot => {
       feedback.step('Merging upstream and extracted POT files...');
       return sourcePot.trim().length > 0
