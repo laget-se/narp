@@ -53,7 +53,7 @@ const fetchTranslationsForLang = ({ project, resource, language }, { username, p
  * object with locales as keys and gettext-parser PO JSON as values.
  */
 export const fetchTranslations = (options, credentials = {}) => {
-  const { project, resource, sourceLang } = options;
+  const { project, resource, sourceLanguage } = options;
 
   feedback.step('Fetching available languages from Transifex...');
 
@@ -62,7 +62,7 @@ export const fetchTranslations = (options, credentials = {}) => {
       feedback.step('Fetching translations for all languages...');
       return languages;
     })
-    .then(languages => languages.concat(sourceLang))
+    .then(languages => languages.concat(sourceLanguage))
     .then(languages => Promise.all(
       languages.map(language =>
         fetchTranslationsForLang({ project, resource, language }, credentials)
