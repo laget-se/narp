@@ -1,9 +1,9 @@
-import { fetchUrl } from 'fetch';
+import got from 'got';
 import { po } from 'gettext-parser';
 
 import * as feedback from '../feedback.js';
 
-const API_URL = 'http://www.transifex.com/api/2';
+const API_URL = 'https://www.transifex.com/api/2';
 
 /**
  * Asserts that all necessary credentials are provided.
@@ -25,53 +25,26 @@ const getHeaders = ({ username, password }) => ({
 /**
  * Fetches all languages for which there are translations to fetch.
  */
-const fetchLanguages = ({ project }, { username, password }) =>
-  new Promise((resolve, reject) => {
-    const url = `${API_URL}/project/${project}/languages`;
-    const headers = getHeaders({ username, password });
+const fetchLanguages = ({ project }, { username, password }) => {
+  const url = `${API_URL}/project/${project}/languages`;
+  const headers = getHeaders({ username, password });
 
-    fetchUrl(url, { headers }, (err, meta, body) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-
-      if (meta.status >= 400) {
-        // rant('Request error', body.toString());
-        reject(meta);
-        return;
-      }
-
-      const data = JSON.parse(body.toString());
-      const langs = data.map(x => x.language_code);
-      resolve(langs);
-    });
+  return got(url, { headers }).then(({ body }) => {
+    const langs = JSON.parse(body).map(x => x.language_code);
+    return langs;
   });
+};
 
 /**
  * Fetches and returns translations for a given project, resource and language.
  */
 const fetchTranslationsForLang = ({ project, resource, language }, { username, password }) => {
-  return new Promise((resolve, reject) => {
-    const url = `${API_URL}/project/${project}/resource/${resource}/translation/${language}`;
-    const headers = getHeaders({ username, password });
+  const url = `${API_URL}/project/${project}/resource/${resource}/translation/${language}`;
+  const headers = getHeaders({ username, password });
 
-    fetchUrl(url, { headers }, (err, meta, body) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-
-      if (meta.status >= 400) {
-        // rant('Request error', body.toString());
-        reject(meta);
-        return;
-      }
-
-      // rant(`Got translations for ${lang}`, body.toString());
-      const poJson = po.parse(JSON.parse(body.toString()).content);
-      resolve(poJson);
-    });
+  return got.get(url, { headers }).then(({ body }) => {
+    // rant(`Got translations for ${lang}`, body.toString());
+    return po.parse(JSON.parse(body).content);
   });
 };
 
@@ -105,58 +78,29 @@ export const fetchTranslations = (options, credentials = {}) => {
 /**
  * Fetches and returns the current source POT.
  */
-export const fetchSource = (options, credentials = {}) =>
-  new Promise((resolve, reject) => {
-    const { project, resource } = options;
+export const fetchSource = (options, credentials = {}) => {
+  const { project, resource } = options;
 
-    const url = `${API_URL}/project/${project}/resource/${resource}/content?file`;
-    const headers = getHeaders(credentials);
+  const url = `${API_URL}/project/${project}/resource/${resource}/content?file`;
+  const headers = getHeaders(credentials);
 
-    fetchUrl(url, { headers }, (err, meta, body) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-
-      if (meta.status >= 400) {
-        // rant('Request error', body.toString());
-        reject(meta);
-        return;
-      }
-
-      resolve(body.toString('utf-8'));
-    });
-  });
+  return got.get(url, { headers }).then(({ body }) => body);
+};
 
 /**
  * Uploads a new POT to be the new source.
  */
-export const uploadTranslations = (pot, options, credentials = {}) =>
-  new Promise((resolve, reject) => {
-    const { project, resource } = options;
+export const uploadTranslations = (pot, options, credentials = {}) => {
+  const { project, resource } = options;
 
-    const url = `${API_URL}/project/${project}/resource/${resource}/content/`;
-    const requestOptions = {
-      method: 'PUT',
-      payload: JSON.stringify({ content: pot }),
-      headers: {
-        ...getHeaders(credentials),
-        'Content-Type': 'application/json',
-      },
-    };
+  const url = `${API_URL}/project/${project}/resource/${resource}/content/`;
+  const requestOptions = {
+    headers: {
+      ...getHeaders(credentials),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ content: pot }),
+  };
 
-    fetchUrl(url, requestOptions, (err, meta) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-
-      if (meta.status >= 400) {
-        // rant('Request error', body.toString());
-        reject(meta);
-        return;
-      }
-
-      resolve();
-    });
-  });
+  return got.put(url, requestOptions);
+};
