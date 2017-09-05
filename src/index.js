@@ -9,7 +9,7 @@ import { getConfig } from './confighelpers';
 import { Vendors } from './constants.js';
 import * as feedback from './feedback.js';
 import * as transifex from './vendors/transifex.js';
-// import poeditor from './vendors/poeditor.js';
+import * as poeditor from './vendors/poeditor.js';
 
 const assertVendor = vendorName => {
   if ([Vendors.TRANSIFEX, Vendors.POEDITOR].indexOf(vendorName) === -1) {
@@ -21,20 +21,13 @@ const assertVendor = vendorName => {
   }
 };
 
-const assertCredentials = ({ username, password }) => {
-  if (!username || !password) {
-    console.log('You need to provide credentials in the form of username and password. [More info]');
-    process.exit(0);
-  }
-};
-
 const getVendor = vendorName => {
   if (vendorName === Vendors.TRANSIFEX) {
     return transifex;
   }
-  // else if (vendorName === Vendors.POEDITOR) {
-  //   return poeditor;
-  // }
+  else if (vendorName === Vendors.POEDITOR) {
+    return poeditor;
+  }
 
   return null;
 };
@@ -51,10 +44,11 @@ const pull = (configs = {}) => {
   const { name, credentials, options } = conf.vendor;
 
   assertVendor(name);
-  assertCredentials(credentials);
+
+  const vendor = getVendor(name);
+  vendor.assertCredentials(credentials);
 
   // const rant = feedback.ranter(conf.verbose);
-  const vendor = getVendor(name);
 
   // Fetch translations
   vendor.fetchTranslations(options, credentials).then(translations => {
@@ -82,10 +76,11 @@ const push = (configs = {}) => {
   const { name, credentials, options } = conf.vendor;
 
   assertVendor(name);
-  assertCredentials(credentials);
+
+  const vendor = getVendor(name);
+  vendor.assertCredentials(credentials);
 
   // const rant = feedback.ranter(conf.verbose);
-  const vendor = getVendor(name);
 
   feedback.step('Extracting messages from source code...');
   const messages = extractMessagesFromGlob(conf.extract.source);
@@ -96,9 +91,10 @@ const push = (configs = {}) => {
 
   vendor.fetchSource(options, credentials)
     .then(sourcePot => {
-      // Merge pots
       feedback.step('Merging upstream and extracted POT files...');
-      return mergePotContents(sourcePot, pot);
+      return sourcePot.trim().length > 0
+        ? mergePotContents(sourcePot, pot)
+        : pot;
     })
     .then(mergedPot => {
       feedback.step('Uploading new POT...');

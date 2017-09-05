@@ -33,11 +33,15 @@
     "colors": "^1.1.2",
     "deep-extend": "^0.4.1",
     "fetch": "^1.0.1",
+    "form-data": "^2.3.1",
     "gettext-parser": "^1.1.2",
+    "got": "^7.1.0",
     "mkdirp": "^0.5.1",
     "pot-merge": "^2.1.0",
+    "qs": "^6.5.0",
     "react-gettext-parser": "^1.0.0",
     "read": "^1.0.7",
+    "string-to-stream": "^1.1.0",
     "yargs": "^4.6.0"
   }
 }

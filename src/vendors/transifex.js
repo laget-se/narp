@@ -6,6 +6,16 @@ import * as feedback from '../feedback.js';
 const API_URL = 'http://www.transifex.com/api/2';
 
 /**
+ * Asserts that all necessary credentials are provided.
+ */
+export const assertCredentials = ({ username, password }) => {
+  if (!username || !password) {
+    console.log('You need to provide credentials in the form of username and password. [More info]');
+    process.exit(0);
+  }
+};
+
+/**
  * Returns a request headers object
  */
 const getHeaders = ({ username, password }) => ({

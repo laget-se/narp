@@ -21,6 +21,9 @@ export const getConfig = () => {
     if (configs.vendor.credentials.password === undefined) {
       configs.vendor.credentials.password = process.env.NARP_VENDOR_PASSWORD;
     }
+    if (configs.vendor.credentials.token === undefined) {
+      configs.vendor.credentials.token = process.env.NARP_VENDOR_TOKEN;
+    }
   }
 
   return configs;
