@@ -140,7 +140,7 @@ You will have to provide different credentials depending on the translation serv
 
 #### Authorizing to Transifex
 
-First, provide the Transifex username via the `vendor.credentials.username` config (see config section below). Then, there are three ways you can provide a password:
+First, provide the Transifex username via the `vendor.credentials.username` config (see the config shape section). Then, there are three ways you can provide a password:
 
 a. Via the `---password` argument
 b. Via the `NARP_VENDOR_PASSWORD` environment variable
