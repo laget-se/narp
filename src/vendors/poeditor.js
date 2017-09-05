@@ -25,6 +25,28 @@ export const assertCredentials = ({ token }) => {
 };
 
 /**
+ * Fetches all languages for which there are translations to fetch.
+ */
+const fetchLanguages = ({ project }, { token }) => {
+  const options = {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: qs.stringify({
+      api_token: token,
+      id: project,
+    }),
+  };
+
+  return got(`${API_URL}/languages/list`, options).then(({ body }) => {
+    const { response, result } = JSON.parse(body);
+    return response.status === 'success'
+      ? result.languages.map(x => x.code)
+      : [];
+  });
+};
+
+/**
  * Fetches and returns a URL to a PO resource for a given
  * project and language.
  */
@@ -60,9 +82,9 @@ const fetchTranslationsForLang = ({ project, language }, { token }) =>
  * object with locales as keys and gettext-parser PO JSON as values.
  */
 export const fetchTranslations = (options, credentials = {}) => {
-  const { project, sourceLanguage } = options;
+  const { project } = options;
 
-  return Promise.resolve(options.languages.concat(sourceLanguage))
+  return fetchLanguages({ project }, credentials)
     .then(languages => {
       feedback.step(`Fetching translations for all languages... ${languages}`);
       return languages;
