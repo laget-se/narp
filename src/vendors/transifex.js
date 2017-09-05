@@ -10,7 +10,17 @@ const API_URL = 'https://www.transifex.com/api/2';
  */
 export const assertCredentials = ({ username, password }) => {
   if (!username || !password) {
-    console.log('You need to provide credentials in the form of username and password. [More info]');
+    console.log(
+`You need to provide credentials in the form of username and password.
+
+You can provide a password by either:
+
+      * passing a vendor.credentials.password option in the function call;
+      * providing a --password argument to the CLI; or
+      * setting a NARP_VENDOR_PASSWORD environment variable
+
+See https://github.com/laget-se/narp#readme for more info.`
+    );
     process.exit(0);
   }
 };

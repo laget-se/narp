@@ -18,7 +18,9 @@ export const assertCredentials = ({ token }) => {
 
       * passing a vendor.credentials.token option in the function call;
       * providing a --token argument to the CLI; or
-      * setting a NARP_VENDOR_TOKEN environment variable`
+      * setting a NARP_VENDOR_TOKEN environment variable
+
+See https://github.com/laget-se/narp#readme for more info.`
     );
     process.exit(0);
   }
