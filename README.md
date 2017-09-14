@@ -16,6 +16,27 @@ A workflow utility to ease localization in JS(X) apps by automizing the followin
 
 The JSON translations are formatted for [node-gettext](https://github.com/andris9/node-gettext).
 
+<detail>
+<summary><strong>Table of Contents</strong></summary>
+  
+* [Installation](#installation)
+* [Usage](#usage)
+  * [Using the CLI](#using-the-cli)
+  * [Using the API](#using-the-api)
+* [Configuration](#configuration)
+  * [Options](#options)
+  * [How to provide credentials](#how-to-provide-credentials)
+    * [Authorizing to Transifex](#authorizing-to-transifex)
+    * [Authorizing to POEditor](#authorizing-to-poeditor)
+  * [.narprc](#narprc)
+* [Development](#development)
+  * [Creating builds](#creating-builds)
+  * [Making it globally available while testing](#making-it-globally-available-while-testing)
+  * [Releases](#releases)
+
+</detail>
+
+
 ## Installation
 
 To use it easily, install narp globally with:
