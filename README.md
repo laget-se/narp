@@ -16,7 +16,7 @@ A workflow utility to ease localization in JS(X) apps by automizing the followin
 
 The JSON translations are formatted for [node-gettext](https://github.com/andris9/node-gettext).
 
-<detail>
+<details>
 <summary><strong>Table of Contents</strong></summary>
   
 * [Installation](#installation)
@@ -34,7 +34,7 @@ The JSON translations are formatted for [node-gettext](https://github.com/andris
   * [Making it globally available while testing](#making-it-globally-available-while-testing)
   * [Releases](#releases)
 
-</detail>
+</details>
 
 
 ## Installation
