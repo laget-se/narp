@@ -3,10 +3,8 @@ import path from 'path';
 import { GETTEXT_FUNC_ARGS_MAP, GETTEXT_COMPONENT_PROPS_MAP } from 'react-gettext-parser';
 import extend from 'deep-extend';
 
-const config = {
-  transifex: {
-    sourceLang: 'en',
-  },
+const defaultConfig = {
+  vendor: {},
   extract: {
     componentPropsMap: GETTEXT_COMPONENT_PROPS_MAP,
     funcArgumentsMap: GETTEXT_FUNC_ARGS_MAP,
@@ -16,6 +14,17 @@ const config = {
 };
 
 export const getConfig = () => {
-  const content = fs.readFileSync(path.join(process.cwd(), '.narprc'), 'utf-8');
-  return extend(config, JSON.parse(content));
+  const fileConfigContent = fs.readFileSync(path.join(process.cwd(), '.narprc'), 'utf-8');
+  const configs = extend(defaultConfig, JSON.parse(fileConfigContent));
+
+  if (configs.vendor && configs.vendor.credentials) {
+    if (configs.vendor.credentials.password === undefined) {
+      configs.vendor.credentials.password = process.env.NARP_VENDOR_PASSWORD;
+    }
+    if (configs.vendor.credentials.token === undefined) {
+      configs.vendor.credentials.token = process.env.NARP_VENDOR_TOKEN;
+    }
+  }
+
+  return configs;
 };

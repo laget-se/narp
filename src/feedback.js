@@ -1,5 +1,10 @@
-
 import colors from 'colors';
+
+let isVerbose = false;
+
+export const setVerbose = (verbose) => {
+  isVerbose = verbose;
+};
 
 export const begin = (...messages) => {
   console.log('\n- - - - - - - -');
@@ -11,14 +16,10 @@ export const step = (...messages) => {
   messages.forEach(msg => console.log(msg.yellow));
 };
 
-export const ranter = (verbose) => {
-  if (verbose) {
-    return (...things) => {
-      things.forEach(thing => console.log(`${thing}`.gray));
-    };
+export const rant = (...messages) => {
+  if (isVerbose === true) {
+    messages.forEach(msg => console.log(msg.gray));
   }
-
-  return () => {};
 };
 
 export const finish = (...messages) => {

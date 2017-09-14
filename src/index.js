@@ -1,156 +1,122 @@
-import { getConfig } from './confighelpers';
-import * as feedback from './feedback.js';
 import { extractMessagesFromGlob, toPot } from 'react-gettext-parser';
-import { fetchUrl } from 'fetch';
 import { mergePotContents } from 'pot-merge';
-import { po } from 'gettext-parser';
 import fs from 'fs';
 import path from 'path';
 import extend from 'deep-extend';
 import mkdirp from 'mkdirp';
 
-const assertPassword = config => {
-  if (!config.transifex.password) {
-    console.log('You need to provide a Transifex password using --password MYPASS');
+import { getConfig } from './confighelpers';
+import { Vendors } from './constants.js';
+import * as feedback from './feedback.js';
+import * as transifex from './vendors/transifex.js';
+import * as poeditor from './vendors/poeditor.js';
+
+const assertVendor = vendorName => {
+  if ([Vendors.TRANSIFEX, Vendors.POEDITOR].indexOf(vendorName) === -1) {
+    console.log(
+      `A vendor with name ${vendorName} is not supported. ` +
+      `You can currently choose between "${Vendors.TRANSIFEX}" and "${Vendors.POEDITOR}".`
+    );
     process.exit(0);
   }
 };
 
+const getVendor = vendorName => {
+  if (vendorName === Vendors.TRANSIFEX) {
+    return transifex;
+  }
+  else if (vendorName === Vendors.POEDITOR) {
+    return poeditor;
+  }
+
+  return null;
+};
+
+/**
+ * Fetches all translations available through the configurated
+ * vendor and writes the whole parsed shebang to the configurated
+ * output path.
+ */
 const pull = (configs = {}) => {
+  const conf = extend(getConfig(), configs);
+
+  feedback.setVerbose(conf.verbose);
   feedback.begin('pull');
 
-  const conf = extend(getConfig(), configs);
-  const { project, resource, username, password, sourceLang } = conf.transifex;
+  const { name, credentials, options } = conf.vendor;
 
-  assertPassword(conf);
+  assertVendor(name);
 
-  const rant = feedback.ranter(conf.verbose);
+  const vendor = getVendor(name);
+  vendor.assertCredentials(credentials);
 
-  feedback.step('Fetching available languages from Transifex...');
+  // Fetch translations
+  return vendor.fetchTranslations(options, credentials).then(translations => {
+    feedback.step('Writing all translations to', path.resolve(conf.output));
 
-  // pull trans from transifex
-  fetchUrl(`http://www.transifex.com/api/2/project/${project}/languages`, {
-    headers: { Authorization: `Basic ${new Buffer(`${username}:${password}`).toString('base64')}` },
-  }, (err, meta, body) => {
-    if (err) {
-      feedback.kill(err);
-    }
+    // Make sure the output directory exists
+    mkdirp.sync(path.dirname(conf.output));
 
-    if (meta.status >= 400) {
-      rant('Request error', body.toString());
-      feedback.kill(meta);
-    }
+    // Write the JSON translations file
+    fs.writeFileSync(conf.output, JSON.stringify(translations, null, 2));
 
-    const data = JSON.parse(body.toString());
-    const langs = data.map(x => x.language_code).concat(sourceLang);
-    const translations = {};
-
-    rant('Got languages:', langs);
-
-    feedback.step('Fetching translations for all languages...');
-
-    langs.forEach(lang => {
-      fetchUrl(`http://www.transifex.com/api/2/project/${project}/resource/${resource}/translation/${lang}`, {
-        headers: {
-          'Authorization': `Basic ${new Buffer(`${username}:${password}`).toString('base64')}`,
-          'Content-Type': 'application/json',
-        },
-      }, (err, meta, body) => {
-        if (err) {
-          feedback.kill(err);
-        }
-
-        if (meta.status >= 400) {
-          rant('Request error', body.toString());
-          feedback.kill(meta);
-        }
-
-        rant(`Got translations for ${lang}`, body.toString());
-        translations[lang] = po.parse(JSON.parse(body.toString()).content);
-
-        if (Object.keys(translations).length === langs.length) {
-          feedback.step('Writing all translations to', path.resolve(conf.output));
-
-          // Make sure the output directory exists
-          mkdirp.sync(path.dirname(conf.output));
-
-          fs.writeFileSync(conf.output, JSON.stringify(translations, null, 2));
-
-          feedback.finish('Translations pulled.');
-        }
-      });
-    });
+    feedback.finish('Translations pulled.');
   });
 };
 
+/**
+ * Extracts translatable strings from the source code, merges them
+ * with the upstream source and uploads the result to the configurated
+ * vendor.
+ */
 const push = (configs = {}) => {
-  feedback.begin('push');
-
-  // extract strings from source => extract
   const conf = extend(getConfig(), configs);
 
-  assertPassword(conf);
+  feedback.setVerbose(conf.verbose);
+  feedback.begin('push');
 
-  const rant = feedback.ranter(conf.verbose);
+  const { name, credentials, options } = conf.vendor;
+
+  assertVendor(name);
+
+  const vendor = getVendor(name);
+  vendor.assertCredentials(credentials);
 
   feedback.step('Extracting messages from source code...');
   const messages = extractMessagesFromGlob(conf.extract.source);
   const pot = toPot(messages);
-  rant('extracted pot:', pot);
+  feedback.rant('Extracted pot:', pot);
 
-  const { project, resource, username, password } = conf.transifex;
+  feedback.step('Fetching upstream POT source...');
 
-  // pull translations from transifex
-  feedback.step('Fetching POT from Transifex...');
-  fetchUrl(`http://www.transifex.com/api/2/project/${project}/resource/${resource}/content?file`, {
-    headers: { Authorization: `Basic ${new Buffer(`${username}:${password}`).toString('base64')}` },
-  }, (err, meta, body) => {
-    if (err) {
-      feedback.kill(err);
-    }
-
-    if (meta.status >= 400) {
-      console.log(body.toString());
-      feedback.kill(meta);
-    }
-
-    rant('...got pot from transifex:\n', body.toString());
-
-    // Merge pots
-    feedback.step('Merging upstream and extracted POT files...');
-    const mergedPot = mergePotContents(body.toString('utf-8'), pot);
-    rant('...merged pot:\n', mergedPot);
-
-    // push pots to transifex
-    feedback.step('Uploading new POT to Transifex...');
-    fetchUrl(`http://www.transifex.com/api/2/project/${project}/resource/${resource}/content/`, {
-      method: 'PUT',
-      payload: JSON.stringify({ content: mergedPot }),
-      headers: {
-        'Authorization': `Basic ${new Buffer(`${username}:${password}`).toString('base64')}`,
-        'Content-Type': 'application/json',
-      },
-    }, (err, meta, body) => {
-      if (err) {
-        feedback.kill(err);
-      }
-
-      if (meta.status >= 400) {
-        console.log(body.toString());
-        feedback.kill(meta);
-      }
-
-      feedback.finish('Source file updated and uploaded.');
-    });
-  });
+  return vendor.fetchSource(options, credentials)
+    .then(sourcePot => {
+      feedback.rant('...got POT source:', sourcePot);
+      feedback.step('Merging upstream and extracted POT files...');
+      return sourcePot.trim().length > 0
+        ? mergePotContents(sourcePot, pot)
+        : pot;
+    })
+    .then(mergedPot => {
+      feedback.rant('...merged POT into:', mergedPot);
+      feedback.step('Uploading new POT...');
+      return vendor.uploadTranslations(mergedPot, options, credentials);
+    })
+    .then(() => feedback.finish('Source file updated and uploaded.'))
+    .catch(err => feedback.kill(err));
 };
 
+/**
+ * Extracts translatable strings from the source code and outputs
+ * them to the console.
+ */
 const extract = (configs = {}, inputSource = '') => {
+  const conf = extend(getConfig(), configs);
+
+  feedback.setVerbose(true);
   feedback.begin('extraction');
 
   // extract strings from source => extract
-  const conf = extend(getConfig(), configs);
-  const rant = feedback.ranter(true);
   const source = inputSource.length > 0
                  ? [`${inputSource}/**/\{*.js,*.jsx\}`]
                  : conf.extract.source;
@@ -161,7 +127,7 @@ const extract = (configs = {}, inputSource = '') => {
   messages.forEach(msg => {
     const { reference } = msg.comments;
     const refs = reference.map(r => inputSource.length ? r.replace(inputSource, '') : r);
-    rant(`${refs.join(', ')} -> ${msg.msgid}`);
+    feedback.rant(`${refs.join(', ')} -> ${msg.msgid}`);
   });
 
   feedback.finish('Extracted all messages for you.');
