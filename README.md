@@ -29,6 +29,8 @@ The JSON translations are formatted for [node-gettext](https://github.com/andris
     * [Authorizing to Transifex](#authorizing-to-transifex)
     * [Authorizing to POEditor](#authorizing-to-poeditor)
   * [.narprc](#narprc)
+* [Migrations](#migrations)
+  * [Migrating from v2 to v3](#migrating-from-v2-to-v3)
 * [Development](#development)
   * [Creating builds](#creating-builds)
   * [Making it globally available while testing](#making-it-globally-available-while-testing)
@@ -185,6 +187,44 @@ c. Via the `vendor.credentials.token` config passed to the API functions
 ### .narprc
 
 `.narprc` is narp's configuration file. Any configurations you put there will be parsed and applied whenever you use narp. 
+
+
+## Migrations
+
+### Migrating from v2 to v3
+
+v3 introduced vendors, which replaces the hard-coded Transifex support with a modularised vendor support, adding POEditor into the mix. To transition your Transifex configuration, you change `.narprc` from
+
+```js
+{
+  "transifex": {
+    "username": "yourusername",
+    "project": "yourproject",
+    "resource": "yourresource",
+    "sourceLang": "xx"
+  },
+  // More configs...
+}
+```
+
+to
+
+```js
+{
+  "vendor": {
+    "name": "transifex",
+    "credentials": {
+      "username": "yourusername"
+    },
+    "options": {
+      "project": "yourproject",
+      "resource": "yourresource",
+      "sourceLanguage": "xx" // Note that this key is different
+    }
+  },
+  // More configs...
+}
+```
 
 
 ## Development
