@@ -76,7 +76,7 @@ if (args._[0] === 'pull') {
 if (args._[0] === 'push') {
   if (configs.vendor.name === Vendors.TRANSIFEX && !configs.vendor.credentials.password && !args.password) {
     askForPassword(password => {
-      api.pull(buildOptions({ password }, args.verbose));
+      api.push(buildOptions({ password }, args.verbose));
     });
   }
   else if (configs.vendor.name === Vendors.POEDITOR && !configs.vendor.credentials.token && !args.token) {
