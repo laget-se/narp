@@ -8,6 +8,9 @@ const defaultConfig = {
   extract: {
     componentPropsMap: { ...GETTEXT_COMPONENT_PROPS_MAP },
     funcArgumentsMap: { ...GETTEXT_FUNC_ARGS_MAP },
+    trim: false,
+    trimLines: false,
+    trimNewlines: false,
   },
   merge: {},
   output: 'messages.json',

@@ -145,10 +145,13 @@ This is the shape of narp's configuration. It can be provided as an object to th
     // that may contain translatable strings.
     "source": null,
 
-    // These two are passed directly to react-gettext-parser,
-    // see the react-gettext-parser readme
+    // The rest of the `extract` configs are passed directly to
+    // react-gettext-parser, see the react-gettext-parser readme.
     "componentPropsMap": { /* react-gettext-parser defaults */ },
-    "funcArgumentsMap": { /* react-gettext-parser defaults */ }
+    "funcArgumentsMap": { /* react-gettext-parser defaults */ },
+    "trim": false,
+    "trimLines": false,
+    "trimNewlines": false,
   },
 
   // Where to put all the translations
