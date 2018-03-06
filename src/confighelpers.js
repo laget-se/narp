@@ -6,8 +6,8 @@ import extend from 'deep-extend';
 const defaultConfig = {
   vendor: {},
   extract: {
-    componentPropsMap: GETTEXT_COMPONENT_PROPS_MAP,
-    funcArgumentsMap: GETTEXT_FUNC_ARGS_MAP,
+    componentPropsMap: { ...GETTEXT_COMPONENT_PROPS_MAP },
+    funcArgumentsMap: { ...GETTEXT_FUNC_ARGS_MAP },
   },
   merge: {},
   output: 'messages.json',

@@ -83,7 +83,8 @@ const push = (configs = {}) => {
   vendor.assertCredentials(credentials);
 
   feedback.step('Extracting messages from source code...');
-  const messages = extractMessagesFromGlob(conf.extract.source);
+  const { source, ...rgpOptions } = conf.extract;
+  const messages = extractMessagesFromGlob(source, rgpOptions);
   const pot = toPot(messages);
   feedback.rant('Extracted pot:', pot);
 
