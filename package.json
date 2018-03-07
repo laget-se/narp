@@ -38,7 +38,7 @@
     "mkdirp": "^0.5.1",
     "pot-merge": "^2.1.0",
     "qs": "^6.5.0",
-    "react-gettext-parser": "^1.0.0",
+    "react-gettext-parser": "^1.4.0",
     "read": "^1.0.7",
     "string-to-stream": "^1.1.0",
     "yargs": "^4.6.0"
