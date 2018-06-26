@@ -64,7 +64,7 @@ narp -h
 
 ```sh
 # extract + merge pots + upload pot
-narp push [<credentials>]
+narp push [<credentials>] [--fresh]
 ```
 
 ```sh
@@ -156,6 +156,11 @@ This is the shape of narp's configuration. It can be provided as an object to th
 
   // Where to put all the translations
   "output": "messages.json",
+
+  // Whether the extracted strings should be uploaded without 
+  // being merged with the current upstream source strings, 
+  // thus replacing it
+  "fresh": false,
 
   // If true, will output debug information to the console
   "verbose": false
