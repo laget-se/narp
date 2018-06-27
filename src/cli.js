@@ -27,16 +27,23 @@ const sharedOptions = yargsObj =>
 // Construct the CLI
 const args = yargs
   .command('pull', 'Get stuff', sharedOptions)
-  .command('push', 'Push stuff', sharedOptions)
+  .command('push', 'Push stuff', y => sharedOptions(y)
+    .option('fresh', {
+      alias: 'f',
+      type: 'boolean',
+      description: 'Skips upstream merge and pushes the extracted POT as is',
+    })
+  )
   .help('help')
   .alias('help', 'h')
   .argv;
 
 const configs = getConfig();
 
-const buildOptions = (credentials, verbose) => ({
+const buildOptions = (credentials, verbose, fresh) => ({
   vendor: { credentials },
   verbose,
+  fresh,
 });
 
 const askForPassword = (fn) => {
@@ -76,12 +83,12 @@ if (args._[0] === 'pull') {
 if (args._[0] === 'push') {
   if (configs.vendor.name === Vendors.TRANSIFEX && !configs.vendor.credentials.password && !args.password) {
     askForPassword(password => {
-      api.push(buildOptions({ password }, args.verbose));
+      api.push(buildOptions({ password }, args.verbose, args.fresh));
     });
   }
   else if (configs.vendor.name === Vendors.POEDITOR && !configs.vendor.credentials.token && !args.token) {
     askForToken(token => {
-      api.push(buildOptions({ token }, args.verbose));
+      api.push(buildOptions({ token }, args.verbose, args.fresh));
     });
   }
   else {
@@ -90,7 +97,8 @@ if (args._[0] === 'push') {
         password: args.password || configs.vendor.credentials.password,
         token: args.token || configs.vendor.credentials.token,
       },
-      args.verbose
+      args.verbose,
+      args.fresh
     ));
   }
 }

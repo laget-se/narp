@@ -13,6 +13,7 @@ const defaultConfig = {
     trimNewlines: false,
   },
   merge: {},
+  fresh: false,
   output: 'messages.json',
 };
 

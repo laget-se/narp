@@ -69,7 +69,7 @@ const pull = (configs = {}) => {
  * with the upstream source and uploads the result to the configurated
  * vendor.
  */
-const push = (configs = {}) => {
+const push = async (configs = {}) => {
   const conf = extend(getConfig(), configs);
 
   feedback.setVerbose(conf.verbose);
@@ -82,29 +82,38 @@ const push = (configs = {}) => {
   const vendor = getVendor(name);
   vendor.assertCredentials(credentials);
 
+  // Extract pot from source
   feedback.step('Extracting messages from source code...');
   const { source, ...rgpOptions } = conf.extract;
   const messages = extractMessagesFromGlob(source, rgpOptions);
   const pot = toPot(messages);
   feedback.rant('Extracted pot:', pot);
 
-  feedback.step('Fetching upstream POT source...');
+  let newUpstreamPot = pot;
 
-  return vendor.fetchSource(options, credentials)
-    .then(sourcePot => {
+  try {
+    // Only merge with upstream source if `--fresh` was not set
+    if (conf.fresh === false) {
+      feedback.step('Fetching upstream POT source...');
+      const sourcePot = await vendor.fetchSource(options, credentials);
       feedback.rant('...got POT source:', sourcePot);
+
       feedback.step('Merging upstream and extracted POT files...');
-      return sourcePot.trim().length > 0
-        ? mergePotContents(sourcePot, pot)
+      newUpstreamPot = sourcePot.trim().length > 0
+        ? await mergePotContents(sourcePot, pot)
         : pot;
-    })
-    .then(mergedPot => {
-      feedback.rant('...merged POT into:', mergedPot);
-      feedback.step('Uploading new POT...');
-      return vendor.uploadTranslations(mergedPot, options, credentials);
-    })
-    .then(() => feedback.finish('Source file updated and uploaded.'))
-    .catch(err => feedback.kill(err));
+      feedback.rant('...merged POT into:', newUpstreamPot);
+    }
+
+    // Upload pot
+    feedback.step('Uploading new POT...');
+    await vendor.uploadTranslations(newUpstreamPot, options, credentials);
+
+    feedback.finish('Source file updated and uploaded.');
+  }
+  catch (err) {
+    feedback.kill(err);
+  }
 };
 
 /**
