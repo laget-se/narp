@@ -1,6 +1,6 @@
 {
   "name": "narp",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "The worlds best super translation manager package handler",
   "main": "dist/index.js",
   "bin": "bin/narp.js",
