@@ -27,8 +27,7 @@
     }
   ],
   "devDependencies": {
-    "babel": "^6.5.2",
-    "babel-cli": "^6.7.5",
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.5",
     "babel-plugin-transform-object-rest-spread": "^6.6.5",
