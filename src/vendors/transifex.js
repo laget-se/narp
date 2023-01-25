@@ -3,7 +3,7 @@ import { po } from 'gettext-parser';
 
 import * as feedback from '../feedback.js';
 
-const API_URL = 'https://www.transifex.com/api/2';
+const API_URL = 'https://www.transifex.com/api/3';
 
 /**
  * Asserts that all necessary credentials are provided.
