@@ -59,9 +59,9 @@ const askForToken = (fn) => {
 };
 
 if (args._[0] === 'pull') {
-  if (configs.vendor.name === Vendors.TRANSIFEX && !configs.vendor.credentials.password && !args.password) {
-    askForPassword(password => {
-      api.pull(buildOptions({ password }, args.verbose));
+  if (configs.vendor.name === Vendors.TRANSIFEX && !configs.vendor.credentials.token && !args.token) {
+    askForToken(token => {
+      api.pull(buildOptions({ token }, args.verbose));
     });
   }
   else if (configs.vendor.name === Vendors.POEDITOR && !configs.vendor.credentials.token && !args.token) {
@@ -81,9 +81,9 @@ if (args._[0] === 'pull') {
 }
 
 if (args._[0] === 'push') {
-  if (configs.vendor.name === Vendors.TRANSIFEX && !configs.vendor.credentials.password && !args.password) {
-    askForPassword(password => {
-      api.push(buildOptions({ password }, args.verbose, args.fresh));
+  if (configs.vendor.name === Vendors.TRANSIFEX && !configs.vendor.credentials.token && !args.token) {
+    askForToken(token => {
+      api.push(buildOptions({ token }, args.verbose, args.fresh));
     });
   }
   else if (configs.vendor.name === Vendors.POEDITOR && !configs.vendor.credentials.token && !args.token) {

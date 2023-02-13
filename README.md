@@ -113,18 +113,15 @@ This is the shape of narp's configuration. It can be provided as an object to th
     // See the section below on how to provide passwords
     // and tokens.
     "credentials": {
-
-      // Transifex needs a username and password
-      "username": "my-tfx-username",
-      "password": "do not store this in a file",
-
-      // POEditor needs a token
+      // POEditor/Transifex token
       "token": "do not store this in a file"
     },
 
     // The vendor.options object contain project specific
     // options, some of which differ depending on the vendor
     "options": {
+      // Transifex only: The organization slug
+      "organization": "organization-slug",
 
       // Project ID.
       "project": "project-id",
@@ -174,13 +171,13 @@ You will have to provide different credentials depending on the translation serv
 
 #### Authorizing to Transifex
 
-First, provide the Transifex username via the `vendor.credentials.username` config (see the config shape section). Then, there are three ways you can provide a password:
+There are three ways of providing an API token:
 
-a. Via the `---password` argument
-b. Via the `NARP_VENDOR_PASSWORD` environment variable
-c. Via the `vendor.credentials.password` config passed to the API functions
+a. Via the `--token` argument
+b. Via the `NARP_VENDOR_TOKEN` environment variable
+c. Via the `vendor.credentials.token` config passed to the API functions
 
-*Never store passwords in your code!*
+*Never store secret tokens in your code!*
 
 #### Authorizing to POEditor
 
@@ -225,6 +222,43 @@ to
       "username": "yourusername"
     },
     "options": {
+      "project": "yourproject",
+      "resource": "yourresource",
+      "sourceLanguage": "xx" // Note that this key is different
+    }
+  },
+  // More configs...
+}
+```
+
+### Migrating from v3 to v5
+Updated to use the new Transifex API. Change `.narprc` from
+
+```js
+{
+  "vendor": {
+    "name": "transifex",
+    "credentials": {
+      "username": "yourusername"
+    },
+    "options": {
+      "project": "yourproject",
+      "resource": "yourresource",
+      "sourceLanguage": "xx" // Note that this key is different
+    }
+  },
+  // More configs...
+}
+```
+
+to
+
+```js
+{
+  "vendor": {
+    "name": "transifex",
+    "options": {
+      "organization": "yourorganization",
       "project": "yourproject",
       "resource": "yourresource",
       "sourceLanguage": "xx" // Note that this key is different
