@@ -223,6 +223,7 @@ export const uploadTranslations = async (pot, options, credentials = {}) => {
         callback_url: null,
         replace_edited_strings: false,
         content: pot,
+        content_encoding: 'text',
       },
       relationships: {
         resource: {
@@ -246,13 +247,13 @@ export const uploadTranslations = async (pot, options, credentials = {}) => {
 
   let status = data.attributes.status;
   if (['pending', 'processing'].includes(status)) {
-    status = await awaitTranslationUpload();
+    status = await awaitTranslationUpload(data.links.self, credentials);
   }
 
-  if (data.attributes.status === 'failed') {
+  if (status === 'failed') {
     feedback.kill('Failed to upload POT file');
   }
-  else if (data.attributes.status !== 'succeeded') {
+  else if (status !== 'succeeded') {
     throw new Error('Unexpected Upload Status');
   }
 };
